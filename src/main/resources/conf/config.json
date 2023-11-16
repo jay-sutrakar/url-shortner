@@ -1,0 +1,9 @@
+{
+  "table_name" : "url_info_table",
+  "postgres_username" : "postgres",
+  "postgres_password" : "mysecretpassword",
+  "postgres_database" : "url_shortner_db",
+  "postgres_host" : "localhost",
+  "postgres_port" : 5432,
+  "http_port" : 8080
+}
