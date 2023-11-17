@@ -6,6 +6,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.example.url_shortner.exception.InvalidRequestException;
 import org.example.url_shortner.models.ErrorMessage;
@@ -47,9 +48,11 @@ public class RouterVerticle extends AbstractVerticle {
             var url = routingContext.queryParams().get(URL);
             urlShortnerService.createHashCode(url).onSuccess(hashCode -> {
                 var shortUrl = Utility.getShortUrlFromHashCode(hashCode);
+                log.info("logType=tracking | description=\"short url created successfully.\" | shorturl={}", shortUrl);
                 routingContext.response()
                         .setStatusCode(200)
-                        .end(new JsonObject().put("short_url", shortUrl).encodePrettily());
+                        .putHeader("content-type", "application/json")
+                        .end(new JsonObject().put("short_url", shortUrl).toBuffer());
             }).onFailure(error -> {
                 this.handleErrorMessage(error, routingContext);
             });
@@ -62,6 +65,7 @@ public class RouterVerticle extends AbstractVerticle {
             var hashcode = routingContext.pathParam("urlhashcode");
             urlShortnerService.getRedirectionUrl(hashcode)
                     .onSuccess(redirectedUrl -> {
+                        log.info("logType=tracking | description=\"Successfully fetched mapped url for {} hashcode.\" | url={}", hashcode, redirectedUrl);
                         routingContext.response()
                                 .putHeader("location", redirectedUrl)
                                 .setStatusCode(302)

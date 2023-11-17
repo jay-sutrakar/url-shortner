@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <Configuration status="warn">
     <Appenders>
         <!-- Console appender configuration -->
@@ -7,7 +8,7 @@
     </Appenders>
     <Loggers>
         <!-- Root logger referring to console appender -->
-        <Root level="debug" additivity="false">
+        <Root level="info" additivity="false">
             <AppenderRef ref="console" />
         </Root>
     </Loggers>
