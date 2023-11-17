@@ -12,7 +12,7 @@ public class Utility {
         //TODO need to figure out the logic to generate hash
 //        String encodeString = Base64.getEncoder().encodeToString(bytes);
         // temp workaround
-        return UUID.randomUUID().toString().replace("-", "").substring(0, 7);
+        return UUID.randomUUID().toString();
     }
 
     public static String getShortUrlFromHashCode(String hashCode) {

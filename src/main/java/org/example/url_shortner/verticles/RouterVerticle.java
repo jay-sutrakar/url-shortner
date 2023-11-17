@@ -6,7 +6,7 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.CorsHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.example.url_shortner.exception.InvalidRequestException;
 import org.example.url_shortner.models.ErrorMessage;
@@ -25,6 +25,7 @@ public class RouterVerticle extends AbstractVerticle {
         configRetriever.getConfig().onSuccess(result -> {
             urlShortnerService = new UrlShortnerService(vertx, result);
             Router router = Router.router(vertx);
+            router.route().handler(CorsHandler.create(".*."));
             router.get("/api/v1/data/shorturl")
                     .handler(this::createShortUrlHandler);
             router.get("/api/v1/:urlhashcode")
@@ -85,6 +86,7 @@ public class RouterVerticle extends AbstractVerticle {
         ErrorMessage errorMessage = new ErrorMessage(statusCode, e.getMessage());
         routingContext.response()
                 .setStatusCode(statusCode)
-                .end(errorMessage.toJsonObject().encodePrettily());
+                .putHeader("content-type", "application/json")
+                .end(errorMessage.toJsonObject().toBuffer());
     }
 }

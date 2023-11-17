@@ -33,7 +33,6 @@ public class UrlShortnerService {
     public Future<String> getRedirectionUrl(String hashCode) {
         Promise<String> promise = Promise.promise();
         String query = Utility.getSelectQueryForUrlSearch(hashCode, appProperties.getString(TABLE_NAME));
-        System.out.println(query);
         storageService.executeFetchQuery(query)
                 .onSuccess(result -> {
                     if (result != null && result.getJsonArray(ENTRIES) != null && result.getJsonArray(ENTRIES).size() > 0) {
@@ -69,7 +68,8 @@ public class UrlShortnerService {
                     var newHashCode = Utility.getEncodedString(newUrl);
                     insertIntoDB(url, newHashCode, pr);
                     return pr.future();
-                }).onSuccess(promise::complete)
+                })
+                .onSuccess(promise::complete)
                 .onFailure(error -> {
                     if (error instanceof NotFoundException) {
                         insertIntoDB(url, hashCode, promise);
@@ -84,7 +84,10 @@ public class UrlShortnerService {
     private void insertIntoDB(String url, String hashCode, Promise<String> promise) {
         var query = Utility.getInsertQueryForUrlEntry(url, hashCode, appProperties.getString(TABLE_NAME));
         storageService.executeInsertQuery(query)
-                .onSuccess(r -> promise.complete(hashCode))
+                .onSuccess(r -> {
+                    log.info("logType=tracking | description=\"Successfully added entry in db\"");
+                    promise.complete(hashCode);
+                })
                 .onFailure(promise::fail);
     }
 
