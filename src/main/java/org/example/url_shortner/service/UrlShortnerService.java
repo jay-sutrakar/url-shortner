@@ -36,7 +36,7 @@ public class UrlShortnerService {
         System.out.println(query);
         storageService.executeFetchQuery(query)
                 .onSuccess(result -> {
-                    if (result != null && result.getJsonArray(ENTRIES) != null) {
+                    if (result != null && result.getJsonArray(ENTRIES) != null && result.getJsonArray(ENTRIES).size() > 0) {
                         UrlInfo urlInfo = result.getJsonArray(ENTRIES).getJsonObject(0).mapTo(UrlInfo.class);
                         if (urlInfo.getUrl() != null) {
                             promise.complete(urlInfo.getUrl());
@@ -71,10 +71,10 @@ public class UrlShortnerService {
                     return pr.future();
                 }).onSuccess(promise::complete)
                 .onFailure(error -> {
-                    log.error("logType=error | exceptionClass={} | method=createHashCode | errorMessage={}", error.getClass().getName(), error.getMessage());
                     if (error instanceof NotFoundException) {
                         insertIntoDB(url, hashCode, promise);
                     } else {
+                        log.error("logType=error | exceptionClass={} | method=createHashCode | errorMessage={}", error.getClass().getName(), error.getMessage());
                         promise.fail(error);
                     }
                 });
